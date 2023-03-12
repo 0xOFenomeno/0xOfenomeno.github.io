@@ -8,10 +8,10 @@ Hi to everyone, the purpose of this blog is to share you some write-ups: CTF cha
 
 This blog's posts will also be dedicated to various cybersecurity topics. :)
 
-If my capabilities allows me to reach a certain level in ***penetration testing / bug bounty / red teaming*** I will try to write some specific articles about offensie security!
+If my capabilities allows me to reach a certain level, I will try to write some technical articles about blue team and red team topics!
 
 
-I will also share my journeys about offensive security certifications.
+I will also share my journeys about cybersecurity certifications.
 
 
 

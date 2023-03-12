@@ -5,11 +5,11 @@ title: About
 
 # [](#whoami) Whoami
 
-O Fenomeno, 22 yo, turkish & french cybersecurity enthusiast. I'm especially interested in offensive security (penetration testing, bug bounty, red teaming) but DFIR and threat intelligence are two defensive security topics which attract me. 
+O Fenomeno, 22 yo, turkish & french cybersecurity enthusiast. I'm especially interested in offensive security (penetration testing, bug bounty, red teaming), DFIR and Cyber Threat Intelligence. 
 
-My aim is to integrate a company or a public organisation as a junior penetration tester. To take and pass certifications like eJPT, eJPTv2 and OSCP are also in my mind, I think  it's pretty soon for taking OSCP but I can't affirm that for eJPT, so it's possible that I take the eJPT or eJPTv2 exam in 2023.
+My aim is to integrate a company or a public organisation as a junior penetration tester, incident handler or threat hunter/threat intelligence analyst. To take and pass certifications like eJPTv2 or OSCP are also in my mind, I think  it's soon for taking OSCP but I can't affirm that for eJPT, so it's possible that I take the eJPTv2 exam in 2023.
 
-I also consider starting bug bounty very soon.
+I also consider starting bug bounty soon.
 
 
 ## Current position
