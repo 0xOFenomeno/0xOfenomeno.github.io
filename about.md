@@ -7,13 +7,8 @@ title: About
 
 O Fenomeno, 22 yo, turkish & french cybersecurity enthusiast. I'm especially interested in offensive security (penetration testing, bug bounty, red teaming), DFIR and Cyber Threat Intelligence. 
 
-My aim is to integrate a company or a public organisation as a junior penetration tester, incident handler or threat hunter/threat intelligence analyst. To take and pass certifications are also in my mind.
-
-I also consider starting bug bounty soon.
-
-
 ## Current position
-I'm in the last year of Computer Sciences Master's degree with a specialisation in cybersecurity at University of Lorraine. At the same time, I'm also a cybersecurity apprentice at the french company Maison Thiriet.
+I'm in the last year of Computer Sciences Master's degree with a specialisation in cybersecurity at University of Lorraine. At the same time, I'm also a cybersecurity apprentice at the french company Maison Thiriet, my current position is CISO assistant.
 
 ## [](#experience)Profiles
 - [Github](https://github.com/0xofenomeno)
@@ -24,7 +19,6 @@ I'm in the last year of Computer Sciences Master's degree with a specialisation 
 
 ## [](#certifications)Certifications
 - MOOC ANSSI (2021)
-- TryHackMe Jr. Penetration Learning Path (2022)
 - TOEIC 925/990 (2022)
 
 ## [](#contact) Contact
