@@ -5,23 +5,19 @@ title: About
 
 # [](#whoami) Whoami
 
-O Fenomeno, 22 yo, turkish & french cybersecurity enthusiast. I'm especially interested in offensive security (penetration testing, bug bounty, red teaming), DFIR and Cyber Threat Intelligence. 
+O Fenomeno, 22 yo, turkish & french cybersecurity enthusiast. I'm especially interested in DFIR, Cyber Threat Intelligence and offensive security (penetration testing, bug bounty, red teaming).
 
-## Current position
-I'm in the last year of Computer Sciences Master's degree with a specialisation in cybersecurity at University of Lorraine. At the same time, I'm also a cybersecurity apprentice at the french company Maison Thiriet, my current position is CISO assistant.
+
+Moreover, I'm also a Fenerbahçe SK fan since 2004. My nickname "Ofenomeno" comes from brazilian "O Fenômeno" Ronaldo R9 (the real Ronaldo).
+
 
 ## [](#experience)Profiles
-- [Github](https://github.com/0xofenomeno)
 - [Root-Me](https://www.root-me.org/ofenomeno)
 - [THM](https://tryhackme.com/p/ofenomeno)
 - [HTB](https://app.hackthebox.com/profile/964076)
 
 
-## [](#certifications)Certifications
-- MOOC ANSSI (2021)
-- TOEIC 925/990 (2022)
-
 ## [](#contact) Contact
 - [Mail](mailto:ofenomen00@protonmail.com)
-- Discord: **Ofenomeno#3152**
-- Twitter? Soon...
+- Discord: **@0xofenomeno**
+- [Twitter](https://twitter.com/o_fenomen0)
