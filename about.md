@@ -19,6 +19,5 @@ My nickname "Ofenomeno" comes from brazilian "O Fenômeno" Ronaldo R9 (the real 
 
 
 ## [](#contact) Contact
-- [Mail](mailto:ofenomen00@protonmail.com)
 - Discord: **@0xofenomeno**
 - [Twitter](https://twitter.com/o_fenomen0)
