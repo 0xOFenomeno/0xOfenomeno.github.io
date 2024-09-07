@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>FCSC 2023 - Misc - Zéro pointé- Writeup - FR</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="shortcut icon" type="image/png" href="/assets/favicon.png">
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>FCSC 2023 - Misc - Zéro pointé- Writeup - FR | OFenomeno</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="FCSC 2023 - Misc - Zéro pointé- Writeup - FR" />
+<meta name="author" content="OFenomeno" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="http://localhost:8000/FR-FCSC2023-Zero-Pointe-WriteUp" />
+<meta property="og:url" content="http://localhost:8000/FR-FCSC2023-Zero-Pointe-WriteUp" />
+<meta property="og:site_name" content="OFenomeno" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-05-01T00:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="FCSC 2023 - Misc - Zéro pointé- Writeup - FR" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"OFenomeno","url":"ofenomeno.xyz"},"dateModified":"2023-05-01T00:00:00+02:00","datePublished":"2023-05-01T00:00:00+02:00","description":"Introduction","headline":"FCSC 2023 - Misc - Zéro pointé- Writeup - FR","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:8000/FR-FCSC2023-Zero-Pointe-WriteUp"},"url":"http://localhost:8000/FR-FCSC2023-Zero-Pointe-WriteUp"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>root@ofenomeno:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/posts"><h2 class="header-link">Posts</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>FCSC 2023 - Misc - Zéro pointé- Writeup - FR</h2>
+  <time datetime="2023-05-01T00:00:00+02:00" class="by-line">01 May 2023</time>
+  <h1 id="introduction"><a href="#Introduction"></a>Introduction</h1>
+
+<p>Bonjour à tous, cette semaine se déroulait la FCSC (France Cybersecurity Challenge) 2023, n’ayant pas eu le temps de me concentrer à 100% sur le CTF, j’ai néanmoins eu du temps libre pour réaliser quelques challenges dont le dénommé <strong>Zéro pointé</strong> dans la catégorie misc.</p>
+
+<h1 id="contexte"><a href="#Contexte"></a>Contexte</h1>
+
+<p>Ce challenge nous fournissait deux fichiers, un exécutable <code class="language-plaintext highlighter-rouge">zero-pointe</code> et un fichier C <code class="language-plaintext highlighter-rouge">zero-pointe.c</code>.</p>
+
+<p>Voici le code C fourni:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;signal.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/stat.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;fcntl.h&gt;</span><span class="cp">
+</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="nf">flag</span><span class="p">(</span><span class="kt">int</span> <span class="n">sig</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="n">sig</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">flag</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+
+    <span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">"flag.txt"</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"open"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">flag</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"read"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">flag</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">flag</span><span class="p">[</span><span class="n">strstr</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span> <span class="o">-</span> <span class="n">flag</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"close"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+
+    <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_SUCCESS</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">long</span>
+<span class="nf">read_long</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">long</span> <span class="n">val</span><span class="p">;</span>
+    <span class="n">scanf</span><span class="p">(</span><span class="s">"%ld"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">val</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">long</span> <span class="n">a</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">b</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">c</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">signal</span><span class="p">(</span><span class="n">SIGFPE</span><span class="p">,</span> <span class="n">flag</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIG_ERR</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"signal"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">read_long</span><span class="p">();</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">read_long</span><span class="p">();</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">b</span> <span class="o">?</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"%ld</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_SUCCESS</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Ce programme est composé de 3 fonctions:</p>
+<ul>
+  <li>La fonction <code class="language-plaintext highlighter-rouge">flag</code> permettant de lire et d’afficher le flag.</li>
+  <li>la fonction <code class="language-plaintext highlighter-rouge">read_long</code> permettant de lire un entier long en entrée de clavier et de le retourner</li>
+  <li>et la fonction <code class="language-plaintext highlighter-rouge">main</code> qui est la fonction principale de notre programme et celle qui nous intéresse le + dans le cadre de ce challenge.</li>
+</ul>
+
+<h2 id="la-fonction-main"><a href="#Main"></a>La fonction main</h2>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span>
+<span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">long</span> <span class="n">a</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">b</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">c</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">signal</span><span class="p">(</span><span class="n">SIGFPE</span><span class="p">,</span> <span class="n">flag</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIG_ERR</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"signal"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">read_long</span><span class="p">();</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">read_long</span><span class="p">();</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">b</span> <span class="o">?</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"%ld</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_SUCCESS</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>La fonction <code class="language-plaintext highlighter-rouge">main</code> fait appel à la fonction <code class="language-plaintext highlighter-rouge">flag</code> que si le signal <strong>SIGFPE</strong>, synonyme d’exception arithmétique, est déclenché. Compte tenu du code, ce signal ne peut être déclenché que par les entiers longs <strong><em>a</em></strong> et <strong><em>b</em></strong> saisis par l’utilisateur.</p>
+
+<h3 id="première-hypothèse"><a href="#Hyp-1"></a>Première hypothèse</h3>
+
+<p>La première hypothèse est le déclenchement du fameux signal SIGFPE via la division par 0, or la ligne</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c</span> <span class="o">=</span> <span class="n">b</span> <span class="o">?</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></div></div>
+<p>empêche la division par 0 puisque elle affecte à la variable <strong><em>c</em></strong> la valeur de la division <strong>a/b</strong> que si <strong><em>b</em></strong> ne vaut pas 0. Si <strong><em>b</em></strong> vaut 0, alors la valeur 0 est directment assignée à la variable <strong><em>c</em></strong> pour éviter la division par… 0 (oui ça fait beaucoup de zéros effectivement).</p>
+
+<p>L’hypothèse de la division par 0 tombe donc à l’eau.</p>
+
+<h3 id="deuxième-hypothèse"><a href="#Hyp-2"></a>Deuxième hypothèse</h3>
+
+<p>La deuxième hypothèse est celle de l’Integer Overflow avec une division négative, donc de saisir pour au moins l’un des deux entiers longs, une valeur non représentable par l’espace mémoire alloué.</p>
+
+<p>Pour cela, j’ai utilisé ce petit programe me permettant de connaître l’entier long maximum pouvant être stocké par la mémoire.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;limits.h&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"Long max: %ld</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">LONG_MAX</span><span class="p">);</span>
+<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>qui m’a retourné la valeur suivante: <strong>9223372036854775807</strong></p>
+
+<p>Suite à cela, j’ai essayé de récupérer le flag avec les entiers négatifs longs suivants:</p>
+<ul>
+  <li>a = -9223372036854775808</li>
+  <li>b = -1</li>
+</ul>
+
+<p>et…</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ofenomeno@pcofenomeno:~/Documents/fcsc/misc/zero<span class="nv">$ </span>nc challenges.france-cybersecurity-challenge.fr 2050
+<span class="nt">-9223372036854775808</span>
+<span class="nt">-1</span>
+FCSC<span class="o">{</span>0366ff5c59934da7301c0fc6cf7d617c99ad6f758831b1dc70378e59d1e060bf<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Nous récupérons le flag!</p>
+
+<h1 id="-conclusion"><a href="#Conclusion"></a> Conclusion</h1>
+
+<p>N’hésitez pas à me contacter sur Discord <strong>Ofenomeno#3152</strong> si vous avez des questions! Et bonne chance aux participants sélectionnés pour la prochaine étape de la FCSC! :)</p>
+
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>OFenomeno</b>
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+  
+
+
+  
+</body>
+
+</html>

