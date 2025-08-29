@@ -2,7 +2,7 @@ title: OFenomeno
 description: "OFenomeno's blog"
 author:
   name: "OFenomeno"
-  email: "ofenosecureprotonmail.com"
+  email: "ofenosecure@protonmail.com"
   url: "ofenomeno.xyz"
 
 baseurl: /
@@ -29,4 +29,4 @@ plugins:
 
 # Custom variables
 owner : "OFenomeno"
-year : "2024"
+year : "2025"
