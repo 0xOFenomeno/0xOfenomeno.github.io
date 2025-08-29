@@ -5,9 +5,9 @@ title: About
 
 # [](#whoami) Whoami
 
-O Fenomeno, 23 yo, turkish & french cybersecurity enthusiast. I'm especially interested in DFIR, Cyber Threat Intelligence and offensive security (penetration testing, bug bounty, red teaming).
+O Fenomeno, 24 yo, turkish & french cybersecurity enthusiast. I'm especially interested in DFIR, Cyber Threat Intelligence and offensive security (penetration testing, bug bounty, red teaming).
 
-I'm currently an incident Handler at CERT-XLM, Excelium Services' CSIRT team based in Luxembourg and Belgium.
+I currently work as an IT Security Officer at Croix-Rouge luxembourgeoise (Luxembourg Red-Cross).
 
 ## [](#profiles)Profiles
 - [Root-Me](https://www.root-me.org/ofenomeno)
