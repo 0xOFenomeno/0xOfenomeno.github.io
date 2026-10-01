@@ -19,4 +19,3 @@ O Fenomeno, 26 yo, turkish & french cybersecurity enthusiast. I'm especially int
 - Discord: **@0xofenomeno**
 - Session: 05145630da40c551b46f0f2e36461306770dfd5dfa534f282fc8c8ac8961f28a6d
 - Signal: @ofenomeno.02
-- X: 
